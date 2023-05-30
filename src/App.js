@@ -18,29 +18,8 @@ class App extends Component {
       imageUrl: "",
       box: {},
       route: 'signin',
-      isSignedIn: false,
-      user: {
-        id: '',
-        name: '',
-        email: '',
-        password: '',
-        entries: 0,
-        joined: ''
-
-      }
+      isSignedIn: false
     };
-  }
-
-  loadUser = (data) => {
-    this.setState({user: {
-      id: data.id,
-      name: data.name,
-      email: data.email,
-      password: 'bananas',
-      entries: 0,
-      joined: new Date()
-    }
-    })
   }
 
   calculateFaceLocation = (data) => {
@@ -105,16 +84,7 @@ class App extends Component {
     )
       .then((response) => response.text())
       .then((result) => {
-        if(result) {console.log(result);
-          fetch('http://localhost:4000/image', {
-            method: 'put',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-              id: this.state.user.id
-            })
-          })
-        }
-        let res = JSON.parse(result);
+        let res = JSON.parse(result); 
         this.displayFaceBox(this.calculateFaceLocation(res))
       })
       .catch((error) => console.log("error", error));
@@ -138,9 +108,7 @@ class App extends Component {
         { route === 'home'
             ? <div>
               <Logo />
-              <Rank
-                  name = {this.state.user.name}
-                  entries = {this.state.user.entries}/>
+              <Rank />
               <ImageLinkForm
                   onInputChange={this.onInputChange}
                   onButtonSubmit={this.onButtonSubmit}
@@ -150,7 +118,7 @@ class App extends Component {
             : (
                 route === 'signin'
                 ? <Signin onRouteChange={this.onRouteChange}/>
-                : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+                : <Register onRouteChange={this.onRouteChange}/>
            )
         }
       </div>
