@@ -24,12 +24,10 @@ class Signin extends React.Component {
                 password: this.state.signInPassword
             })
         })
-            .then(response => {
-                response.json();
-                console.log(response)
-            })
-            .then(data => {
-                if (data === 'success') {
+            .then(response => response.json())
+            .then(user => {
+                if (user.id) {
+                    this.props.loadUser(user);
                     this.props.onRouteChange('home');
                 }
             })
@@ -83,8 +81,7 @@ class Signin extends React.Component {
                         <div className="">
                             <input
                                 className="b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib"
-                                type="submit"
-                                value="Sign in"
+                                defaultValue="Sign in"
                                 onClick={this.onSubmitSignIn}
                             />
                         </div>
