@@ -10,23 +10,25 @@ import ParticlesBg from "particles-bg";
 import "tachyons";
 import { Component } from "react";
 
+const initialState = {
+  input: "",
+  imageUrl: "",
+  box: {},
+  route: 'signin',
+  isSignedIn: false,
+  user: {
+    id: '',
+    name: '',
+    email: '',
+    entries: 0,
+    joined: ''
+  }
+}
+
 class App extends Component {
   constructor() {
     super();
-    this.state = {
-      input: "",
-      imageUrl: "",
-      box: {},
-      route: 'signin',
-      isSignedIn: false,
-      user: {
-        id: '',
-        name: '',
-        email: '',
-        entries: 0,
-        joined: ''
-      }
-    };
+    this.state = initialState;
   }
 
   loadUser = (data) => {
@@ -63,48 +65,25 @@ class App extends Component {
   };
 
   onButtonSubmit = () => {
-    this.setState({imageUrl: this.state.input})
-
     // URL of image to use. Change this to your image.
     const IMAGE_URL = this.state.input;
-
-    const raw = JSON.stringify({
-      user_app_id: {
-        user_id: "clarifai",
-        app_id: "main",
-      },
-      inputs: [
-        {
-          data: {
-            image: {
-              url: IMAGE_URL,
-            },
-          },
-        },
-      ],
-    });
-
-    const requestOptions = {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        Authorization: "Key " + "0a8a23cc62a54f75a8021375162c7b68",
-      },
-      body: raw,
-    };
+    this.setState({imageUrl: IMAGE_URL})
 
     // NOTE: MODEL_VERSION_ID is optional, you can also call prediction with the MODEL_ID only
     // https://api.clarifai.com/v2/models/{YOUR_MODEL_ID}/outputs
     // this will default to the latest version_id
 
-    fetch(
-      `https://api.clarifai.com/v2/models/face-detection/versions/6dc7e46bc9124c5c8824be4822abe105/outputs`,
-      requestOptions
-    )
-      .then((response) => response.text())
-      .then((result) => {
-        if(result) {
-          fetch("http://localhost:4000/image", {
+    fetch('https://smart-brain-api-308j.onrender.com/imageurl', {
+      method:'post',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        input: IMAGE_URL
+      })
+    })
+      .then((result) => result.json())
+        .then(response => {
+        if(response) {
+          fetch("https://smart-brain-api-308j.onrender.com/image", {
             method: 'put',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -115,8 +94,11 @@ class App extends Component {
               .then(count => {
                 this.setState(Object.assign(this.state.user, {entries: count}))
               })
+              .catch(console.log)
         }
-        let res = JSON.parse(result);
+        console.log("Response:" + response);
+        // THE BOX DOES NOT DISPLAY
+        let res = JSON.parse(response);
         this.displayFaceBox(this.calculateFaceLocation(res))
       })
       .catch((error) => console.log("error", error));
@@ -124,7 +106,7 @@ class App extends Component {
 
   onRouteChange = (route) => {
     if(route === 'signout') {
-      this.setState({isSignedIn: false})
+      this.setState(initialState)
     } else if (route === 'home') {
       this.setState({isSignedIn: true})
     }

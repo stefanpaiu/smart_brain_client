@@ -23,7 +23,7 @@ class Register extends React.Component {
 
     onSubmitSignIn = () => {
         console.log("Registering...")
-        fetch('http://localhost:4000/register', {
+        fetch('https://smart-brain-api-308j.onrender.com/register', {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -34,7 +34,7 @@ class Register extends React.Component {
         })
             .then(response => response.json())
             .then(user => {
-                if (user) {
+                if (user.id) {
                     this.props.loadUser(user);
                     this.props.onRouteChange('home');
                 }
